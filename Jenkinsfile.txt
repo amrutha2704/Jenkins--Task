@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git "https://github.com/amrutha2704/Jenkins--Task.git"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    // Install Python if not available
+                    def pythonExists = sh(script: 'python3 --version', returnStatus: true) == 0
+                    if (!pythonExists) {
+                        sh 'sudo apt-get update'
+                        sh 'sudo apt-get install -y python3'
+                    }
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    // Run Python script to verify it works
+                    sh 'python3 prime_calculator.py'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Deploy stage logic, this is a placeholder
+                    // For example, copy the script to a specific directory or server
+                    sh 'cp prime_calculator.py /desired/deployment/path/'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '*.py', allowEmptyArchive: true
+        }
+    }
+}
